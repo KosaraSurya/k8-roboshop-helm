@@ -1,0 +1,3 @@
+StatefulSet:
+  imageURL: suryaprakashkosra/mongodb
+  imageVersion: v1
