@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: roboshop
+  # Deployment set labels
+  labels:
+    component: mongodb
+    project: roboshop
+    tier: database
+spec:
+  serviceName: "mongodb-headless" # this should be headless service
+  replicas: 3
+   # These are the labels replica set use to create pod replicas, this should match pod labels
+  selector:
+    matchLabels:
+      component: mongodb
+      project: roboshop
+      tier: database 
+
+  # This is pod definition
+  template:
+    metadata:
+      labels:
+        component: mongodb
+        project: roboshop
+        tier: database 
+    spec:
+      containers:
+      - name: mongodb
+        image: "{{ .Values.StatefulSet.imageURL}}:{{ .Values.StatefulSet.imageVersion}}"
+        volumeMounts:
+        - name: mongodb-data
+          mountPath: /data/db
+
+
+  # This is nothing but PVC, you can directly create here
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-data
+      namespace: roboshop
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-ebs"
+      resources:
+        requests:
+          storage: 2Gi
